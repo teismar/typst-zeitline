@@ -1,0 +1,11 @@
+# Generated files
+*.pdf
+*.png
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
