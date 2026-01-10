@@ -2,6 +2,12 @@
 
 A Typst package for plotting timelines.
 
+## Examples
+
+![Timeline Example](img/spinetest.png)
+
+![Custom Theme Example](img/custom_theme.png)
+
 ## Installation
 
 Copy this package to your Typst packages directory or use it locally:
