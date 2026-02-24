@@ -35,7 +35,7 @@
 }
 
 /// Render a vertical timeline from a list of events.
-#let timeline(data, theme: none) = {
+#let timeline(data, theme: none, justify: true) = {
   let t = merge-theme(theme)
   let c = t.colors
   let s = t.sizes
@@ -58,6 +58,7 @@
       // Generate Text Content
       let left-content = if is-left {
         align(right)[
+          #set par(justify: justify)
           #text(weight: "bold", size: s.date, fill: c.accent)[#event.date] \
           #text(size: s.body, fill: c.muted)[#event.desc]
         ]
@@ -65,6 +66,7 @@
 
       let right-content = if not is-left {
         align(left)[
+          #set par(justify: justify)
           #text(weight: "bold", size: s.date, fill: c.accent)[#event.date] \
           #text(size: s.body, fill: c.muted)[#event.desc]
         ]
