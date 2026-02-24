@@ -28,7 +28,7 @@ This is a demonstration of how the justification option changes the layout of th
 
 == With ragged edge
 
-#timeline(events, justify: false)
+#timeline(events)
 
 == With full justification
 

@@ -35,7 +35,7 @@
 }
 
 /// Render a vertical timeline from a list of events.
-#let timeline(data, theme: none, justify: true) = {
+#let timeline(data, theme: none, justify: false) = {
   let t = merge-theme(theme)
   let c = t.colors
   let s = t.sizes
