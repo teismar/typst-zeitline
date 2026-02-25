@@ -28,3 +28,6 @@ jobs:
 
     - name: Compile long.typ
       run: typst compile --root . tests/long.typ
+
+    - name: Compile justification.typ
+      run: typst compile --root . tests/justification.typ
