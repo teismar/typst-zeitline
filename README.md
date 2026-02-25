@@ -41,6 +41,18 @@ Each event is a dictionary with:
 - `desc`: Event description (required)
 - `side` (optional): Force "left" or "right" placement (alternates by default)
 
+## Justification
+
+You can control the text alignment of event descriptions using the justify argument. This is particularly useful for long descriptions to ensure they fill the row width cleanly while maintaining the vertical spine's connectivity.
+
+```typst
+// For ragged edges (default)
+#timeline(events)
+
+// For full justification
+#timeline(events, justify: true)
+```
+
 ## Theme Customization
 
 ```typst
