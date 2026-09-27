@@ -35,55 +35,64 @@
 }
 
 /// Render a vertical timeline from a list of events.
-#let timeline(data, theme: none, justify: false) = {
+///
+/// - data: Array of event dictionaries with `date`, `desc`, and optional `side`.
+/// - theme: Optional dictionary to override default styling.
+/// - justify: Whether to justify the description text.
+/// - side: Placement mode for the timeline. Options:
+///   - `"both"` or `"center"`: Centered spine with alternating events (default).
+///   - `"left"`: Spine on the left, events on the right.
+///   - `"right"`: Spine on the right, events on the left.
+#let timeline(data, theme: none, justify: false, side: "both") = {
   let t = merge-theme(theme)
   let c = t.colors
   let s = t.sizes
   let sp = t.spacing
   let n = data.len()
 
+  let mode = if side in ("left", "right") { side } else { "both" }
+
   // Use layout to determine available width for columns
   layout(size => context {
     let col-gutter = 0.5em
-    // Calculate column width for 1fr
-    let col-width = (size.width - sp.arm - 2 * col-gutter) / 2
+
+    // Calculate column width
+    let (columns, col-width) = if mode == "both" {
+      let w = (size.width - sp.arm - 2 * col-gutter) / 2
+      ((w, sp.arm, w), w)
+    } else if mode == "left" {
+      let w = size.width - sp.arm - col-gutter
+      ((sp.arm, w), w)
+    } else {
+      // mode == "right"
+      let w = size.width - sp.arm - col-gutter
+      ((w, sp.arm), w)
+    }
 
     let cells = ()
 
     for (i, event) in data.enumerate() {
-      let is-left = event.at("side", default: if calc.even(i) { "left" } else { "right" }) == "left"
+      let is-left = if mode == "left" {
+        false
+      } else if mode == "right" {
+        true
+      } else {
+        event.at("side", default: if calc.even(i) { "left" } else { "right" }) == "left"
+      }
       let is-first = i == 0
       let is-last = i == n - 1
 
       // Generate Text Content
-      let left-content = if is-left {
-        align(right)[
-          #set par(justify: justify)
-          #text(weight: "bold", size: s.date, fill: c.accent)[#event.date] \
-          #text(size: s.body, fill: c.muted)[#event.desc]
-        ]
-      } else { none }
+      let content = align(if is-left { right } else { left })[
+        #set par(justify: justify)
+        #text(weight: "bold", size: s.date, fill: c.accent)[#event.date] \
+        #text(size: s.body, fill: c.muted)[#event.desc]
+      ]
 
-      let right-content = if not is-left {
-        align(left)[
-          #set par(justify: justify)
-          #text(weight: "bold", size: s.date, fill: c.accent)[#event.date] \
-          #text(size: s.body, fill: c.muted)[#event.desc]
-        ]
-      } else { none }
+      let content-box = box(width: col-width, inset: (y: sp.row / 2), content)
+      let empty-box = box(width: col-width, inset: (y: sp.row / 2), none)
 
-      // Measure Heights
-      // Wrap in a constrained box to ensure text wrapping is accounted for.
-      let left-box = box(width: col-width, inset: (y: sp.row / 2), left-content)
-      let right-box = box(width: col-width, inset: (y: sp.row / 2), right-content)
-
-      let h-left = measure(left-box).height
-      let h-right = measure(right-box).height
-      let row-height = calc.max(h-left, h-right)
-
-      // Add Cells
-      // Left Cell
-      cells.push(left-box)
+      let row-height = measure(content-box).height
 
       // Spine Cell
       // Measure title for vertical centering
@@ -116,15 +125,31 @@
           ]
         ]
       ])
-      cells.push(spine-cell)
 
-      // Right Cell
-      cells.push(right-box)
+      // Push cells according to mode
+      if mode == "both" {
+        if is-left {
+          cells.push(content-box)
+          cells.push(spine-cell)
+          cells.push(empty-box)
+        } else {
+          cells.push(empty-box)
+          cells.push(spine-cell)
+          cells.push(content-box)
+        }
+      } else if mode == "left" {
+        cells.push(spine-cell)
+        cells.push(content-box)
+      } else {
+        // mode == "right"
+        cells.push(content-box)
+        cells.push(spine-cell)
+      }
     }
 
-    // Render Single Grid
+    // Render Grid
     grid(
-      columns: (col-width, sp.arm, col-width),
+      columns: columns,
       column-gutter: col-gutter,
       row-gutter: 0pt,
       ..cells
