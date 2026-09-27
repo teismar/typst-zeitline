@@ -39,7 +39,19 @@ Or import directly:
 Each event is a dictionary with:
 - `date`: The date/time label (required)
 - `desc`: Event description (required)
-- `side` (optional): Force "left" or "right" placement (alternates by default)
+- `side` (optional): Force "left" or "right" placement in two-sided mode (alternates by default)
+
+## Timeline Layout (Single-Sided Mode)
+
+By default, the timeline centers the spine and alternates events on both sides (`side: "both"`). You can create single-sided timelines so descriptions can span the full container width:
+
+```typst
+// Left spine with events on the right (full width)
+#timeline(events, side: "left")
+
+// Right spine with events on the left
+#timeline(events, side: "right")
+```
 
 ## Justification
 
